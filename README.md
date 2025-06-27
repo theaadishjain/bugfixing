@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Hackweek Countdown Crisis — Fixed Issues & Improvements
 
-## Getting Started
+This document lists all the major errors, bugs, and issues fixed in the project, along with a summary of the improvements made to ensure a robust, production-ready Next.js app.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 1. Hydration Mismatches & Data Loading Issues
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**Problem:**
+- The `CommunityInfo` component fetched data from `/cosc.json` on the client using `fetch` and `useEffect`.
+- This caused UI flicker, hydration mismatches, and undefined values on first render.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+**Fix:**
+- Data is now loaded server-side in `app/page.js` using Node.js `fs/promises` and passed as props to both `CommunityInfo` and `Countdown`.
+- All data is available on first render, eliminating hydration warnings and flicker.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 2. Countdown Timer Logic & Flexibility
 
-To learn more about Next.js, take a look at the following resources:
+**Problem:**
+- The countdown timer used a hardcoded end date, making it inflexible and error-prone.
+- There was no handling for when the countdown reached zero.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Fix:**
+- The countdown now receives the end date from the JSON data (`cosc.json`), making it dynamic.
+- When the countdown reaches zero, it displays "Hackweek is over 🎉".
+- Handles missing or invalid end dates gracefully.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 3. React/Next.js Build Errors (App Router)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Problem:**
+- The `Countdown` component used React hooks (`useEffect`, `useState`) but was not marked as a client component.
+- This caused build errors: "You're importing a component that needs `useEffect`. This React hook only works in a client component. To fix, mark the file (or its parent) with the `"use client"` directive."
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Fix:**
+- Added `'use client';` as the first line in `src/app/components/Countdown.js` to mark it as a client component, resolving the build error.
+
+---
+
+## 4. General Improvements
+- Added fallback/default values in components to avoid undefined errors.
+- Ensured all list-rendered elements have keys (if any are added in the future).
+- Updated the event end date in `cosc.json` to reflect the correct Hackweek end time.
+
+---
+
+## How to Run Locally
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Start the development server:
+   ```bash
+   npm run dev
+   ```
+3. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+For further improvements (UI polish, deployment, documentation), see the main `README.md` or contact the maintainer. 
